@@ -18,8 +18,10 @@ import matplotlib.pyplot as plt
 ```
 
 ## Usage
-
-To use the financial calculator program, run the `financial_calculator.py` file on your local machine. The program will prompt you to choose either the investment calculator or the home loan repayment calculator.
+You can run the code using the following command on your local machine:
+```cmd
+python displacment_colorwheel.py
+```
 
 ### Investment Calculator
 
