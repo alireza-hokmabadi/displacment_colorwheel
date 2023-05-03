@@ -27,6 +27,6 @@ python displacment_colorwheel.py
 You are free to use and modify this code in your own projects with proper attribution.
 
 ## Author
-Author: Alireza Hokmabadi
-Email: a.hokmabadi.ee@gmail.com
+- Author: Alireza Hokmabadi
+- Email: [a.hokmabadi.ee@gmail.com](mailto:a.hokmabadi.ee@gmail.com)  
 
