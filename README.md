@@ -23,33 +23,10 @@ You can run the code using the following command on your local machine:
 python displacment_colorwheel.py
 ```
 
-### Investment Calculator
-
-If you choose the investment calculator, the program will ask you to input the following values:
-
-- Deposit amount
-- Interest rate (only the number of the interest without percentage)
-- Number of investing years
-- Type of interest calculation (simple or compound)
-
-The program will then calculate the total amount of interest you'll earn on your investment based on the input values and output the result.
-
-### Home Loan Repayment Calculator
-
-If you choose the home loan repayment calculator, the program will ask you to input the following values:
-
-- Present value of the house
-- Interest rate (only the number of the interest without percentage)
-- Number of months you plan to take to repay the bond
-
-The program will then calculate the amount you'll have to pay on your home loan each month based on the input values and output the result.
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
 ## License
+You are free to use and modify this code in your own projects with proper attribution.
 
-MIT
+## Author
+Author: Alireza Hokmabadi
+Email: a.hokmabadi.ee@gmail.com
+
