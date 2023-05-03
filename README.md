@@ -2,8 +2,8 @@
 
 This Python code provides a visualization of a color wheel and displacement vectors using matplotlib. The color wheel is generated using a custom color mapping function that creates a smooth gradient of colors. The displacement vectors are plotted as arrows on a grid, with the color of each arrow corresponding to the color from the color wheel based on its location. This code can be used to visually represent optical flow or any other displacement-related data in a clear and intuitive manner. It is useful for computer vision, image processing, and graphics applications.
 
-##Getting Started
-###Prerequisites
+## Getting Started
+### Prerequisites
 This code has been written in Python 3. You'll need the following packages installed to run this code:
 
 - numpy
@@ -11,9 +11,10 @@ This code has been written in Python 3. You'll need the following packages insta
 
 ### Installation
 You can install numpy and matplotlib packages using the following commands:
-```python
+'''python
 import numpy as np
 import matplotlib.pyplot as plt
+'''
 
 ## Usage
 
