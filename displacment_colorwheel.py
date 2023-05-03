@@ -144,3 +144,5 @@ if __name__ == '__main__':
     ax.title.set_text("Colored Displacement")
 
     plt.show()
+
+    # plt.savefig("output.png",bbox_inches='tight', pad_inches = 0.2)
