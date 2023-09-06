@@ -145,4 +145,4 @@ if __name__ == '__main__':
 
     plt.show()
 
-    plt.savefig("output.png",bbox_inches='tight', pad_inches = 0.2)
+    # plt.savefig("output.png",bbox_inches='tight', pad_inches = 0.2)
