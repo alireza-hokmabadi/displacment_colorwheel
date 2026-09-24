@@ -4,7 +4,7 @@ A lightweight Python implementation for visualizing 2D displacement or optical-f
 
 The direction of each displacement vector is represented by color, providing an intuitive visualization of vector fields commonly used in image processing and computer vision.
 
-![alt text](https://github.com/alireza-hokmabadi/displacment_colorwheel/blob/master/output.png)
+![Example output](output.png)
 
 ## Requirements
 
@@ -37,7 +37,4 @@ This visualization can be useful for:
 * Image registration
 * Motion analysis
 * Computer vision and medical image processing
-
-- Author: Alireza Hokmabadi
-- Email: [a.hokmabadi.ee@gmail.com](mailto:a.hokmabadi.ee@gmail.com)  
 
