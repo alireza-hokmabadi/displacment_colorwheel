@@ -1,148 +1,185 @@
+"""Color-wheel visualization for 2D displacement fields."""
 
-'''
-Author: Alireza Hokmabadi
-Email: a.hokmabadi.ee@gmail.com
-Title: Color Wheel and Displacement Visualization
-Description: This Python code provides a visualization of a color wheel and displacement vectors using matplotlib.
-The color wheel is generated using a custom color mapping function that creates a smooth gradient of colors.
-The displacement vectors are plotted as arrows on a grid, with the color of each arrow corresponding to the color
-from the color wheel based on its location. This code can be used to visually represent optical flow or any other
-displacement-related data in a clear and intuitive manner. It is useful for computer vision, image processing,
-and graphics applications. You are free to use and modify this code in your own projects with proper attribution.
-Happy coding!
-'''
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-def make_colorwheel():
+
+def make_colorwheel() -> np.ndarray:
     """
-    Generates a colorwheel for optical flow visualization.
+    Create a color wheel for displacement or optical-flow visualization.
 
-    Returns:
-        np.ndarray: A colorwheel represented as an array of RGB values.
+    Returns
+    -------
+    np.ndarray
+        Array of RGB values with shape (n_colors, 3).
     """
-    RY, YG, GC, CB, BM, MR = [15, 6, 4, 11, 13, 6]
+    ry, yg, gc, cb, bm, mr = 15, 6, 4, 11, 13, 6
+    ncols = ry + yg + gc + cb + bm + mr
 
-    ncols = RY + YG + GC + CB + BM + MR
-    colorwheel = np.zeros((ncols, 3), dtype=np.uint8)  # r g b
-
+    colorwheel = np.zeros((ncols, 3), dtype=np.uint8)
     col = 0
 
-    # RY
-    colorwheel[0:RY, 0] = 255
-    colorwheel[0:RY, 1] = np.floor(255 * np.arange(0, RY, 1) / RY)
-    col += RY
+    # Red -> Yellow
+    colorwheel[col : col + ry, 0] = 255
+    colorwheel[col : col + ry, 1] = np.floor(
+        255 * np.arange(ry) / ry
+    )
+    col += ry
 
-    # YG
-    colorwheel[col:YG + col, 0] = 255 - np.floor(255 * np.arange(0, YG, 1) / YG)
-    colorwheel[col:YG + col, 1] = 255
-    col += YG
+    # Yellow -> Green
+    colorwheel[col : col + yg, 0] = 255 - np.floor(
+        255 * np.arange(yg) / yg
+    )
+    colorwheel[col : col + yg, 1] = 255
+    col += yg
 
-    # GC
-    colorwheel[col:GC + col, 1] = 255
-    colorwheel[col:GC + col, 2] = np.floor(255 * np.arange(0, GC, 1) / GC)
-    col += GC
+    # Green -> Cyan
+    colorwheel[col : col + gc, 1] = 255
+    colorwheel[col : col + gc, 2] = np.floor(
+        255 * np.arange(gc) / gc
+    )
+    col += gc
 
-    # CB
-    colorwheel[col:CB + col, 1] = 255 - np.floor(255 * np.arange(0, CB, 1) / CB)
-    colorwheel[col:CB + col, 2] = 255
-    col += CB
+    # Cyan -> Blue
+    colorwheel[col : col + cb, 1] = 255 - np.floor(
+        255 * np.arange(cb) / cb
+    )
+    colorwheel[col : col + cb, 2] = 255
+    col += cb
 
-    # BM
-    colorwheel[col:BM + col, 2] = 255
-    colorwheel[col:BM + col, 0] = np.floor(255 * np.arange(0, BM, 1) / BM)
-    col += BM
+    # Blue -> Magenta
+    colorwheel[col : col + bm, 2] = 255
+    colorwheel[col : col + bm, 0] = np.floor(
+        255 * np.arange(bm) / bm
+    )
+    col += bm
 
-    # MR
-    colorwheel[col:MR + col, 2] = 255 - np.floor(255 * np.arange(0, MR, 1) / MR)
-    colorwheel[col:MR + col, 0] = 255
+    # Magenta -> Red
+    colorwheel[col : col + mr, 2] = 255 - np.floor(
+        255 * np.arange(mr) / mr
+    )
+    colorwheel[col : col + mr, 0] = 255
 
     return colorwheel
 
-def compute_color(u, v):
-    """
-    Compute color image from optical flow vectors u and v.
 
-    Parameters:
-        u (np.ndarray): Optical flow vector in x-direction
-        v (np.ndarray): Optical flow vector in y-direction
-
-    Returns:
-        np.ndarray: Color image with optical flow visualization
+def compute_color(u: np.ndarray, v: np.ndarray) -> np.ndarray:
     """
+    Convert 2D displacement components into an RGB color image.
+
+    Parameters
+    ----------
+    u : np.ndarray
+        Horizontal displacement component.
+    v : np.ndarray
+        Vertical displacement component.
+
+    Returns
+    -------
+    np.ndarray
+        RGB image with shape (height, width, 3) and dtype uint8.
+
+    Raises
+    ------
+    ValueError
+        If ``u`` and ``v`` do not have the same shape or are not 2D arrays.
+    """
+    u = np.asarray(u, dtype=float)
+    v = np.asarray(v, dtype=float)
+
+    if u.shape != v.shape:
+        raise ValueError("u and v must have the same shape.")
+
+    if u.ndim != 2:
+        raise ValueError("u and v must be 2D arrays.")
+
+    # Replace invalid values without modifying the caller's input arrays.
+    u = np.nan_to_num(u, copy=True)
+    v = np.nan_to_num(v, copy=True)
+
     colorwheel = make_colorwheel()
-
-    # Identify NaN values in u and v arrays
-    nan_u = np.isnan(u)
-    nan_v = np.isnan(v)
-
-    # Replace NaN values with zero in u and v arrays
-    u[nan_u] = 0
-    v[nan_v] = 0
-
     ncols = colorwheel.shape[0]
+
     radius = np.hypot(u, v)
     angle = np.arctan2(u, v) / np.pi
-    fk = (angle + 1) / 2 * (ncols - 1)  # -1~1 mapped to 1~ncols
-    k0 = fk.astype(np.uint8)            # 1, 2, ..., ncols
-    k1 = (k0 + 1) % ncols               # Modulo operation to handle edge case
-    f = fk - k0
 
-    img = np.empty((k1.shape[0], k1.shape[1], 3), dtype=np.uint8)  # Initialize as uint8 array for better performance
-    ncolors = colorwheel.shape[1]
-    for i in range(ncolors):
-        tmp = colorwheel[:, i]
-        col0 = tmp[k0] / 255
-        col1 = tmp[k1] / 255
-        col = (1 - f) * col0 + f * col1
-        idx = radius <= 1
-        col[idx] = 1 - radius[idx] * (1 - col[idx])  # increase saturation with radius
-        col[~idx] *= 0.75                            # out of range
-        img[:, :, 2 - i] = (255 * col).astype(np.uint8)  # Use astype() for type casting
+    # Map angle from [-1, 1] to color-wheel indices.
+    fk = (angle + 1) / 2 * (ncols - 1)
 
-    return img
+    k0 = np.floor(fk).astype(np.intp)
+    k1 = (k0 + 1) % ncols
+    fraction = fk - k0
 
-if __name__ == '__main__':
-    #  width of the sample displacement array
-    w = 250
+    image = np.empty((*u.shape, 3), dtype=np.uint8)
 
-    # Generate grid of displacement values for optical flow computation
-    x = np.arange(-w, w+1, 1)
-    y = np.arange(-w, w+1, 1)
+    for channel in range(3):
+        values = colorwheel[:, channel]
 
-    # Create meshgrid of x and y coordinates
+        col0 = values[k0] / 255.0
+        col1 = values[k1] / 255.0
+        color = (1 - fraction) * col0 + fraction * col1
+
+        inside_unit_circle = radius <= 1
+
+        # Increase saturation with displacement magnitude.
+        color[inside_unit_circle] = (
+            1
+            - radius[inside_unit_circle]
+            * (1 - color[inside_unit_circle])
+        )
+
+        # Slightly darken values outside the unit circle.
+        color[~inside_unit_circle] *= 0.75
+
+        image[:, :, 2 - channel] = (255 * color).astype(np.uint8)
+
+    return image
+
+
+def main() -> None:
+    """Generate an example color wheel and displacement-field visualization."""
+    width = 250
+
+    x = np.arange(-width, width + 1)
+    y = np.arange(-width, width + 1)
+
     dis_x, dis_y = np.meshgrid(x, y)
 
-    # Scale x and y coordinates by a factor of 0.0045 and convert to float data type
     dis_x = dis_x.astype(float) * 0.0045
     dis_y = dis_y.astype(float) * 0.0045
 
-    # Call compute_color function
-    dis_colorwheel = compute_color(dis_x, dis_y) / 255.0
+    displacement_colors = compute_color(dis_x, dis_y) / 255.0
 
-    # Create a subplot with 1 row and 2 columns, and set the figure size
-    fig, axs = plt.subplots(1, 2, figsize=(10, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(10, 6))
 
-    # Plot the color wheel on the first subplot
-    ax = axs[0]
-    ax.imshow(dis_colorwheel, vmin=0, vmax=1)
-    ax.axis("on")
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.title.set_text("Color wheel")
+    # Color wheel
+    axes[0].imshow(displacement_colors, vmin=0, vmax=1)
+    axes[0].set_title("Color wheel")
+    axes[0].set_xticks([])
+    axes[0].set_yticks([])
 
-    # Plot the displacements using quiver plot on the second subplot
-    ax = axs[1]
-    ax.quiver(x, y, dis_x, dis_y, color=dis_colorwheel.reshape(-1, 3), angles="xy", scale_units='xy', scale=1.0, width=0.003)
-    ax.axis("scaled")
-    ax.axis([x[0], x[-1], y[0], y[-1]])
-    ax.axis("on")
-    ax.invert_yaxis()
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.title.set_text("Colored Displacement")
+    # Colored displacement vectors
+    axes[1].quiver(
+        x,
+        y,
+        dis_x,
+        dis_y,
+        color=displacement_colors.reshape(-1, 3),
+        angles="xy",
+        scale_units="xy",
+        scale=1.0,
+        width=0.003,
+    )
+    axes[1].axis("scaled")
+    axes[1].axis([x[0], x[-1], y[0], y[-1]])
+    axes[1].invert_yaxis()
+    axes[1].set_xticks([])
+    axes[1].set_yticks([])
+    axes[1].set_title("Colored displacement")
 
+    fig.tight_layout()
     plt.show()
 
-    # plt.savefig("output.png",bbox_inches='tight', pad_inches = 0.2)
+
+if __name__ == "__main__":
+    main()
